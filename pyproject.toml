@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "electrode"
+version = "0.1.0"
+description = "A powerfull audio game engine written in python."
+authors = ["blindelectron <jump.leper@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+cyal = "^0.3.2"
+pysimpleguiwx = "^0.17.2"
+pybullet = "^3.2.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
