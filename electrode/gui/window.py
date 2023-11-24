@@ -1,9 +1,8 @@
 """
 Window class for electrode.
 """
-from typing import Any
 import PySimpleGUIWx as sg
-
+	
 class window:
 	def __init__(self, title: str, layOut: list=[]):
 		self.title=title
