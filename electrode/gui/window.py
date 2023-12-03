@@ -2,14 +2,17 @@
 Window class for electrode.
 """
 import PySimpleGUIWx as sg
-	
+from keyboard import Keyboard
+from elements import Elements
+
 class window:
 	def __init__(self, title: str, layOut: list=[]):
 		self.title=title
 		self._layout=layOut
 		self.active=False
 		self.column=sg.Column(self.layout)
-		
+		self.keyboard=Keyboard(self.window.App)
+		self.elements=Elements
 
 	def launch(self):
 		self.window=sg.Window(self.title, [self.column])
