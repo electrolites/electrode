@@ -29,7 +29,6 @@ class surface(coordinateContainer):
 		super().__init__(minX, maxX, minY, maxY, minZ, maxZ)
 		self.tile=tile
 
-
 class vanishingSurface(surface):
 	def __init__(self, minX: int, maxX: int, minY: int, maxY: int, minZ: int, maxZ: int, tile: str,sound: str, onTime: int, offTime=0):
 		super().__init__(minX, maxX, minY, maxY, minZ, maxZ,tile)
@@ -61,13 +60,13 @@ class wall(surface):
 		self.transparent=transparent
 
 class zone(coordinateContainer):
-	def __init__(self, minX: int, maxX: int, minY: int, maxY: int, minZ: int, maxZ: int, text: str,speak=True):
+	def __init__(self, minX: int, maxX: int, minY: int, maxY: int, minZ: int, maxZ: int, text: str, speak=True):
 		super().__init__(minX, maxX, minY, maxY, minZ, maxZ)
 		self.text=text
 		self.speak=speak
 
 class source(coordinateContainer):
-	def __init__(self, minX: int, maxX: int, minY: int, maxY: int, minZ: int, maxZ: int, sound: str,sourceType=0,stationaryMode=False):
+	def __init__(self, minX: int, maxX: int, minY: int, maxY: int, minZ: int, maxZ: int, sound: str, sourceType=0, stationaryMode=False):
 		#note for type: 0=foreground, 1=background, 2=music
 		super().__init__(minX, maxX, minY, maxY, minZ, maxZ)
 		self.sound=sound
@@ -143,19 +142,19 @@ class Map(coordinateContainer):
 			if zo.isHere(x,y,z): text, speak=zo.text, zo.speak;break
 		return text, speak
 
-	def onWall(self,x ,y ,z):
+	def onWall(self, x: int, y: int, z: int):
 		for w in reversed(self.get(wall)):
 			if w.isHere(x,y,z): return True
 		return False
 
-	def getWall(self,x,y,z):
+	def getWall(self, x: int, y: int, z: int):
 		wallTile=None
 		for w in reversed(self.get(wall)):
 			if w.isHere(x,y,z): wallTile=w.tile
-		return wallTile	
+		return wallTile
 
 	def lock(self, obj):
-		if not hasattr(obj,"x") or not hasattr(obj,"y") or hasattr(obj,"z"): raise RuntimeError("Any object passed to map.lock must have an x, y, and z atribute.")
+		if not hasattr(obj,"x") or not hasattr(obj,"y") or not hasattr(obj,"z"): raise RuntimeError("Any object passed to map.lock must have an x, y, and z atribute.")
 		if self.isHere(obj.x,obj.y,obj.z): return
 		if obj.x>self.maxX: obj.x=self.maxX
 		elif obj.x<self.minX: obj.x=self.minX
