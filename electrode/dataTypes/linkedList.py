@@ -15,8 +15,20 @@ class linkedList:
 		for i in initialData:
 			self.append(i)
 
-	def incert(self, data, index):
+
+
+	def getNode(self, index):
 		if index<0 or index>self.length: raise IndexError('Linked list index out of range.')
+		if index==0: return self.head
+		if index==self.length: return self.tail
+		current=self.head
+		for i in range(index -1):
+			current=current.next
+			if not i==index-1: continue
+			return current.next
+
+	def incert(self, data, index):
+		
 		if index==self.length:
 			self.append(data)
 			return
