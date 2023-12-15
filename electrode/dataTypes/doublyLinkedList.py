@@ -9,7 +9,7 @@ class Node:
 		self.prev=prev
 
 class LinkedList:
-	def __init__(self, initialData: tuple):
+	def __init__(self, initialData: tuple=()):
 		self.head=None
 		self.tail=None
 		self.length=0
@@ -70,10 +70,10 @@ class LinkedList:
 			return
 		current=self.head
 		for i in range(index -1):
+			current=current.next
 			if not  i==index -1: continue
 			current.next=current.next.next
-			current.next.prev=current
-			current=current.next
+			current.next.next.prev=current
 		self.length-=1
 
 	def __str__(self):
@@ -83,5 +83,5 @@ class LinkedList:
 		for i in range(self.length-1):
 			llstr+=f',{current.data}'
 			current=current.next
-		llstr+=f'{self.tail}]'
+		llstr+=f',{self.tail}]'
 		return llstr

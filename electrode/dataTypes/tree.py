@@ -48,3 +48,4 @@ class TreeNode:
 			cstr+=f'{spaces}{child.data}\n'
 			if not child.children: continue
 			for c in child.children: cstr+=c._getChildrenStr()
+		return cstr
