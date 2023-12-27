@@ -2,6 +2,7 @@
 Window class for electrode.
 """
 from pygame import display, SHOWN, HIDDEN
+from webcolors import name_to_rgb
 
 class Window:
 	def __init__(self, title: str):
@@ -22,3 +23,6 @@ class Window:
 	@property
 	def active(self):
 		return display.get_active()
+
+	def setColor(self, color: str):
+		self.pgRoot.fill(name_to_rgb(color))
