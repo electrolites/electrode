@@ -17,7 +17,7 @@ class Window:
 		return self.pgRoot
 
 	def hide(self):
-		self.pgRoot=display.set_mode(self.size, flags=pygame.HIDDEN)
+		self.pgRoot=display.set_mode(self.size, flags=HIDDEN)
 		return self.pgRoot
 
 	@property
@@ -26,3 +26,26 @@ class Window:
 
 	def setColor(self, color: str):
 		self.pgRoot.fill(name_to_rgb(color))
+		display.flip()
+
+	@property
+	def fullScreen(self):
+		if display.is_fullscreen(): return True
+		return False
+
+	@fullScreen.setter
+	def fullScreen(self, val: bool):
+		if val==True:
+			if self.fullScreen==True: return
+			display.toggle_fullscreen()
+		if self.fullScreen==False: return
+		display.toggle_fullscreen()
+
+	@property
+	def title(self):
+		return self._title
+
+	@title.setter
+	def title(self, val: int):
+		self._title=val
+		display.set_caption(val)
