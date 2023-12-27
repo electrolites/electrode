@@ -13,6 +13,7 @@ pybullet = "^3.2.5"
 numpy = "^1.26.2"
 pygame = "^2.5.2"
 webcolors = "^1.13"
+accessible-output2 = "^0.17"
 
 
 [build-system]
