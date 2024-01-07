@@ -3,7 +3,7 @@ Speech classes for electrode.
 """
 from accessible_output2.outputs import auto
 
-class speaker:
+class Speaker:
 	def speak(self,text: str):
 		raise RuntimeError("any speaker class must define a speak function")
 

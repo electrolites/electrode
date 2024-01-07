@@ -5,7 +5,7 @@ from typing import Callable, Any
 from weakref import WeakSet
 from .sound import Sound
 from .pool import pool as Pool
-from utils import convertToCyalCoordinates
+from electrode.utils import convertToCyalCoordinates
 
 soundFactoryType = Callable[[str, Any], Sound]
 

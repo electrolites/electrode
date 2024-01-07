@@ -13,7 +13,7 @@ class Timer:
 	@property
 	def time(self):
 		if self.paused: return self.pausedTime
-		currentTime=self._timeMs(self.initTime-time.time())
+		currentTime=self._timeMs(time.time()-self.initTime)
 		if currentTime>=self.resetThreshold and self.resetThreshold>0:
 			self.restart()
 			currentTime=self._timeMs(self.initTime-time.time())
