@@ -2,6 +2,7 @@
 Window class for electrode.
 """
 import wx
+from electrode.gui.elements import input
 
 class Window:
 	def __init__(self, title: str, app: wx.App | None = None, orientation: wx.VERTICAL | wx.HORIZONTAL = wx.HORIZONTAL, borderWidth: int = 10):
@@ -9,8 +10,8 @@ class Window:
 		self.title=title
 		self.orientation=orientation
 		self.borderWidth=borderWidth
-		self.frame=wx.Frame(title=self.title)
-		self.panel=wx.Panel(self.frame)
+		self.frame=wx.Frame(None, title=self.title)
+		self.panel=wx.Panel(self.frame, name=self.title)
 		self.elements=[]
 		self._initUi()
 
@@ -47,6 +48,11 @@ class Window:
 	def addElement(self, element):
 		self.elements.append(element)
 		self._updateLayout()
+		return element
+
+
+	def addInput(self, message: str, initialText: str = "", multiLine=True, hidden=False, enter = True, tab = False):
+		return self.addElement(input.Input(self.panel, message, initialText=initialText, multiLine=multiLine, hidden=hidden, enter=enter, tab=tab))
 
 	def removeElement(self, element):
 		if not element in self.elements: return
