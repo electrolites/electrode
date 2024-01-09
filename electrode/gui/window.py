@@ -2,7 +2,7 @@
 Window class for electrode.
 """
 import wx
-from electrode.gui.elements import input
+from electrode.gui.elements import input, checkbox
 
 class Window:
 	def __init__(self, title: str, app: wx.App | None = None, orientation: wx.VERTICAL | wx.HORIZONTAL = wx.HORIZONTAL, borderWidth: int = 10):
@@ -45,14 +45,17 @@ class Window:
 		if self.isFullScreen: return
 		self.frame.ShowFullScreen(True,style=wx.FULLSCREEN_ALL)
 
-	def addElement(self, element):
+	def adElement(self, element):
 		self.elements.append(element)
 		self._updateLayout()
 		return element
 
+	def adInput(self, message: str, initialText: str = "", multiLine=True, hidden=False, enter = True, tab = False):
+		return self.adElement(input.Input(self.panel, message, initialText=initialText, multiLine=multiLine, hidden=hidden, enter=enter, tab=tab))
 
-	def addInput(self, message: str, initialText: str = "", multiLine=True, hidden=False, enter = True, tab = False):
-		return self.addElement(input.Input(self.panel, message, initialText=initialText, multiLine=multiLine, hidden=hidden, enter=enter, tab=tab))
+	def adCheckBox(self, label: str, initialState :int = 0, threeWay: bool = False):
+		return self.adElement(checkbox.CheckBox(self.panel,label, initialState=initialState, threeWay=threeWay))
+
 
 	def removeElement(self, element):
 		if not element in self.elements: return
@@ -62,8 +65,10 @@ class Window:
 	def _updateLayout(self):
 		sizer=wx.BoxSizer(self.orientation)
 		for element in self.elements:
+			existingSizer=element.GetContainingSizer()
+			if existingSizer is not None: existingSizer.Detach(element)
 			sizer.Add(element, proportion=1, flag=wx.EXPAND | wx.ALL, border=self.borderWidth)
-		self.panel.SetSizer(sizer)
+			self.panel.SetSizer(sizer)
 		self.frame.Layout()
 
 	@property

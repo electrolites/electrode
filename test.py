@@ -5,7 +5,8 @@ import wx
 def main():
 	window=Window("test")
 	window.show()
-	window.addInput("this is a text fealed")
+	window.adInput("this is a text fealed")
+	window.adCheckBox("test your box", initialState=2, threeWay=True)
 	window.app.MainLoop()
 
 

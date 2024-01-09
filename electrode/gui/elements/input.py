@@ -1,5 +1,5 @@
 """
-Wrapper for wx input widget
+Wraps wx textctrl for electrode.
 """
 import wx
 
