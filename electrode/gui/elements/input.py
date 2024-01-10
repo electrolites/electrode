@@ -11,4 +11,4 @@ class Input(wx.TextCtrl):
 		if enter==True: style |= wx.TE_PROCESS_ENTER
 		if tab==True: style |= wx.TE_PROCESS_TAB
 		super().__init__(parent, value=initialText, style = style)
-		self.SetLabelText(message)
+		self.SetLabel(message)
