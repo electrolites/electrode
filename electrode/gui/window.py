@@ -1,8 +1,9 @@
 """
 Window class for electrode.
 """
+from typing import Callable
 import wx
-from electrode.gui.elements import input, checkbox
+from electrode.gui.elements import input, checkbox, button
 
 class Window:
 	def __init__(self, title: str, app: wx.App | None = None, orientation: wx.VERTICAL | wx.HORIZONTAL = wx.HORIZONTAL, borderWidth: int = 10):
@@ -54,8 +55,10 @@ class Window:
 		return self.adElement(input.Input(self.panel, message, initialText=initialText, multiLine=multiLine, hidden=hidden, enter=enter, tab=tab))
 
 	def adCheckBox(self, label: str, initialState :int = 0, threeWay: bool = False):
-		return self.adElement(checkbox.CheckBox(self.panel,label, initialState=initialState, threeWay=threeWay))
+		return self.adElement(checkbox.CheckBox(self.panel, label, initialState = initialState, threeWay = threeWay))
 
+	def adButton(self, label: str, callback: Callable | None = None):
+		return self.adElement(button.Button(self.panel, label, callback=callback))
 
 	def removeElement(self, element):
 		if not element in self.elements: return
