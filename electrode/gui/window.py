@@ -8,10 +8,10 @@ from electrode.gui.elements import input, checkbox, button
 class Window:
 	def __init__(self, title: str, app: wx.App | None = None, orientation: wx.VERTICAL | wx.HORIZONTAL = wx.HORIZONTAL, borderWidth: int = 10):
 		self.app = app or wx.App()
-		self.title=title
+		self._title=title
 		self.orientation=orientation
 		self.borderWidth=borderWidth
-		self.frame=wx.Frame(None, title=self.title)
+		self.frame=wx.Frame(None, title=self._title)
 		self.panel=wx.Panel(self.frame, name=self.title)
 		self.elements=[]
 		self._initUi()
@@ -90,3 +90,12 @@ class Window:
 	@property
 	def Maximized(self):
 		return self.frame.IsMaximized()
+
+	@property
+	def title(self):
+		return self._title
+
+	@title.setter
+	def title(self, value: str):
+		self._title=value
+		self.frame.SetTitle(value)
