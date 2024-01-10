@@ -23,6 +23,7 @@ class Window:
 	def show(self):
 		if self.shown: return
 		self.frame.Show(True)
+		if len(self.elements)>0: self.elements[0].SetFocus()
 
 	def hide(self):
 		if not self.shown: return
