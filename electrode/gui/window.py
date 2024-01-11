@@ -3,7 +3,7 @@ Window class for electrode.
 """
 from typing import Callable
 import wx
-from electrode.gui.elements import input, checkbox, button
+from electrode.gui.elements import input, checkbox, button, slider
 
 class Window:
 	def __init__(self, title: str, app: wx.App | None = None, orientation: wx.VERTICAL | wx.HORIZONTAL = wx.HORIZONTAL, borderWidth: int = 10):
@@ -60,6 +60,11 @@ class Window:
 
 	def adButton(self, label: str, callback: Callable | None = None):
 		return self.adElement(button.Button(self.panel, label, callback=callback))
+
+	def adSlider(self, label: str, minValue: int = 0, maxValue: int = 100, initialValue: int = 0, onChange: Callable|  None = None, vertical :bool = True):
+		return self.adElement(slider.Slider(self.panel, label, minValue=minValue, maxValue=maxValue, initialValue=initialValue, onChange=onChange, vertical = vertical))
+
+
 
 	def removeElement(self, element):
 		if not element in self.elements: return
