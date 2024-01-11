@@ -9,6 +9,7 @@ def main():
 	window.adCheckBox("test your box", initialState=2, threeWay=True)
 	window.adButton("test your button", buttonTest)
 	window.adSlider("test your slider", 0, 100, 50, onChange=sliderTest)
+	window.adComBobox("test", ["ding1", "dong2", "klang3", "clunk4"])
 	window.show()
 	window.app.MainLoop()
 
