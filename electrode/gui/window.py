@@ -3,7 +3,7 @@ Window class for electrode.
 """
 from typing import Callable
 import wx
-from electrode.gui.elements import input, checkbox, button, slider, combobox
+from electrode.gui.elements import input, checkbox, button, slider, combobox, spinbutton
 
 class Window:
 	def __init__(self, title: str, app: wx.App | None = None, orientation: wx.VERTICAL | wx.HORIZONTAL = wx.HORIZONTAL, borderWidth: int = 10):
@@ -69,7 +69,8 @@ class Window:
 	def adComBobox(self, label: str, choices: list[str], initialSelection: int = 0, onSelect: Callable | None = None, readOnly: bool =True):
 		self.adElement(combobox.ComboBox, self.panel, label, choices=choices.copy(), initialSelection = initialSelection, onSelect = onSelect, readOnly = readOnly)
 
-
+	def adSpinButton(self, label: str, initialValue: int = 0, minValue: int = 0, maxValue: int = 100, aeros: bool = True, wrap: bool = False):
+		return self.adElement(spinbutton.SpinButton, self.panel, label, initialValue = initialValue, minValue = minValue, maxValue = maxValue,  aeros = aeros, wrap = wrap)
 
 	def removeElement(self, element):
 		if not element in self.elements.values(): return
