@@ -10,6 +10,7 @@ def main():
 	window.adButton("test your button", buttonTest)
 	window.adSlider("test your slider", 0, 100, 50, onChange=sliderTest)
 	window.adComBobox("test", ["ding1", "dong2", "klang3", "clunk4"])
+	window.adTobbleButton("test your toggler")
 	window.show()
 	window.app.MainLoop()
 

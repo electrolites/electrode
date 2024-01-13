@@ -3,7 +3,7 @@ Window class for electrode.
 """
 from typing import Callable
 import wx
-from electrode.gui.elements import input, checkbox, button, slider, combobox
+from electrode.gui.elements import input, checkbox, button, togglebutton, slider, combobox
 
 class Window:
 	def __init__(self, title: str, app: wx.App | None = None, orientation: wx.VERTICAL | wx.HORIZONTAL = wx.HORIZONTAL, borderWidth: int = 10):
@@ -13,7 +13,7 @@ class Window:
 		self.borderWidth=borderWidth
 		self.frame=wx.Frame(None, title=self._title)
 		self.panel=wx.Panel(self.frame, name=self.title)
-		self.elements=[]
+		self.elements={}
 		self._initUi()
 
 	def _initUi(self):
@@ -23,7 +23,8 @@ class Window:
 	def show(self):
 		if self.shown: return
 		self.frame.Show(True)
-		if len(self.elements)>0: self.elements[0].SetFocus()
+		children=self.panel.GetChildren()
+		children[0].SetFocus()
 
 	def hide(self):
 		if not self.shown: return
@@ -47,40 +48,53 @@ class Window:
 		if self.isFullScreen: return
 		self.frame.ShowFullScreen(True,style=wx.FULLSCREEN_ALL)
 
-	def adElement(self, element):
-		self.elements.append(element)
+	def adElement(self, element, *args, **kwargs):
+		textLabel = wx.StaticText(self.panel, label = args[1])
+		self.elements[textLabel]=element(*args, **kwargs)
 		self._updateLayout()
 		return element
 
 	def adInput(self, message: str, initialText: str = "", multiLine=True, hidden=False, enter = True, tab = False):
-		return self.adElement(input.Input(self.panel, message, initialText=initialText, multiLine=multiLine, hidden=hidden, enter=enter, tab=tab))
+		return self.adElement(input.Input, self.panel, message, initialText=initialText, multiLine=multiLine, hidden=hidden, enter=enter, tab=tab)
 
 	def adCheckBox(self, label: str, initialState :int = 0, threeWay: bool = False):
-		return self.adElement(checkbox.CheckBox(self.panel, label, initialState = initialState, threeWay = threeWay))
+		return self.adElement(checkbox.CheckBox, self.panel, label, initialState = initialState, threeWay = threeWay)
 
 	def adButton(self, label: str, callback: Callable | None = None):
-		return self.adElement(button.Button(self.panel, label, callback=callback))
+		return self.adElement(button.Button, self.panel, label, callback=callback)
 
 	def adSlider(self, label: str, minValue: int = 0, maxValue: int = 100, initialValue: int = 0, onChange: Callable|  None = None, vertical :bool = True):
-		return self.adElement(slider.Slider(self.panel, label, minValue=minValue, maxValue=maxValue, initialValue=initialValue, onChange=onChange, vertical = vertical))
+		return self.adElement(slider.Slider, self.panel, label, minValue=minValue, maxValue=maxValue, initialValue=initialValue, onChange=onChange, vertical = vertical)
 
 	def adComBobox(self, label: str, choices: list[str], initialSelection: int = 0, onSelect: Callable | None = None, readOnly: bool =True):
-		self.adElement(combobox.ComboBox(self.panel, label, choices=choices.copy(), initialSelection = initialSelection, onSelect = onSelect, readOnly = readOnly))
+		self.adElement(combobox.ComboBox, self.panel, label, choices=choices.copy(), initialSelection = initialSelection, onSelect = onSelect, readOnly = readOnly)
 
+	def adTobbleButton(self, label: str, onToggel: None | Callable = None, initialState: bool = False):
+		return self.adElement(togglebutton.ToggleButton, self.panel, label, onToggel = onToggel , initialState = initialState)
 
 	def removeElement(self, element):
-		if not element in self.elements: return
-		self.elements.remove(element)
+		if not element in self.elements.values(): return
+		for k,p in self.elements.items():
+			if v ==element: self.elements.pop(k)
 		self._updateLayout()
 
 	def _updateLayout(self):
-		sizer=wx.BoxSizer(self.orientation)
-		for element in self.elements:
-			existingSizer=element.GetContainingSizer()
+		sizer=wx.BoxSizer(self.orientation) if self.panel.GetSizer() is None else self.panel.GetSizer()
+		for child in list(self.panel.GetChildren()):
+			if child not in self.elements.keys() and child not in self.elements.values():
+				self.panel.RemoveChild(child)
+				child.Destroy()
+		sizer.Clear()
+		for labelText, element in self.elements.items():
+			existingSizer, textSizer=element.GetContainingSizer(), labelText.GetContainingSizer()
+			if textSizer is not None: textSizer.Detach(labelText)
+			sizer.Add(labelText, proportion=1, flag=wx.ALL, border=self.borderWidth)
 			if existingSizer is not None: existingSizer.Detach(element)
 			sizer.Add(element, proportion=1, flag=wx.EXPAND | wx.ALL, border=self.borderWidth)
-			self.panel.SetSizer(sizer)
+		self.panel.SetSizer(sizer)
 		self.frame.Layout()
+
+
 
 	@property
 	def shown(self):

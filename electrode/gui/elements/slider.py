@@ -11,7 +11,8 @@ class Slider(wx.Slider):
 		if initialValue<minValue: initialValue=minValue
 		elif initialValue>maxValue: initialValue=maxValue
 		style=wx.SL_VERTICAL | wx.SL_INVERSE if vertical == True else wx.SL_HORIZONTAL
-		super().__init__(parent,  minValue=minValue, maxValue=maxValue, style = style)
+		super().__init__(parent, value=initialValue, minValue=minValue, maxValue=maxValue, style = style)
 		self.SetLabel(label)
+		
 		if onChange is not None:
 			self.Bind(wx.EVT_SLIDER, onChange)

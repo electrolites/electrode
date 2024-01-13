@@ -1,6 +1,5 @@
 listbox
 spin button
 radiobuttons
-toggle button
 tree view
 maby web view
