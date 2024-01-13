@@ -13,6 +13,6 @@ class Slider(wx.Slider):
 		style=wx.SL_VERTICAL | wx.SL_INVERSE if vertical == True else wx.SL_HORIZONTAL
 		super().__init__(parent, value=initialValue, minValue=minValue, maxValue=maxValue, style = style)
 		self.SetLabel(label)
-		
 		if onChange is not None:
 			self.Bind(wx.EVT_SLIDER, onChange)
+
