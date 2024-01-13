@@ -54,8 +54,8 @@ class Window:
 		self._updateLayout()
 		return element
 
-	def adInput(self, message: str, initialText: str = "", multiLine=True, hidden=False, enter = True, tab = False):
-		return self.adElement(input.Input, self.panel, message, initialText=initialText, multiLine=multiLine, hidden=hidden, enter=enter, tab=tab)
+	def adInput(self, message: str, initialText: str = "", multiLine: bool = True, hidden: bool = False, enter: bool = True, tab :bool = False, readOnly: bool = False):
+		return self.adElement(input.Input, self.panel, message, initialText=initialText, multiLine=multiLine, hidden=hidden, enter=enter, tab=tab, readOnly =readOnly)
 
 	def adCheckBox(self, label: str, initialState :int = 0, threeWay: bool = False):
 		return self.adElement(checkbox.CheckBox, self.panel, label, initialState = initialState, threeWay = threeWay)

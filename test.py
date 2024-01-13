@@ -5,7 +5,7 @@ import wx
 
 def main():
 	window=Window("test")
-	window.adInput("this is a text fealed")
+	window.adInput("this is a text fealed"
 	window.adCheckBox("test your box", initialState=2, threeWay=True)
 	window.adButton("test your button", buttonTest)
 	window.adSlider("test your slider", 0, 100, 50, onChange=sliderTest)
