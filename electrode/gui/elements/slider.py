@@ -3,7 +3,6 @@ Wraps wx slider for electrode.
 """
 import wx
 from typing import Callable
-from time import sleep
 
 class Slider(wx.Slider):
 	def __init__(self, parent, label: str, minValue: int = 0, maxValue: int = 100, initialValue: int = 0, onChange: Callable | None  = None, vertical: bool = True):
