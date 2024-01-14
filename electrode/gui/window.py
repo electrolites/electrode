@@ -3,7 +3,7 @@ Window class for electrode.
 """
 from typing import Callable
 import wx
-from electrode.gui.elements import input, checkbox, button, slider, combobox, spinbutton
+from electrode.gui.elements import input, checkbox, button, slider, combobox, spinbutton, listbox
 
 class Window:
 	def __init__(self, title: str, app: wx.App | None = None, orientation: wx.VERTICAL | wx.HORIZONTAL = wx.HORIZONTAL, borderWidth: int = 10):
@@ -54,7 +54,7 @@ class Window:
 		self._updateLayout()
 		return element
 
-	def adInput(self, message: str, initialText: str = "", multiLine: bool = True, hidden: bool = False, enter: bool = True, tab :bool = False, readOnly: bool = False):
+	def adInput(self, message: str, initialText: str = "", multiLine: bool = True, hidden: bool = False, enter: bool = True, tab: bool = False, readOnly: bool = False):
 		return self.adElement(input.Input, self.panel, message, initialText=initialText, multiLine=multiLine, hidden=hidden, enter=enter, tab=tab, readOnly =readOnly)
 
 	def adCheckBox(self, label: str, initialState :int = 0, threeWay: bool = False):
@@ -71,6 +71,10 @@ class Window:
 
 	def adSpinButton(self, label: str, initialValue: int = 0, minValue: int = 0, maxValue: int = 100, aeros: bool = True, wrap: bool = False):
 		return self.adElement(spinbutton.SpinButton, self.panel, label, initialValue = initialValue, minValue = minValue, maxValue = maxValue,  aeros = aeros, wrap = wrap)
+
+	def adListBox(self, label: str, choices: list[str], onSelect: Callable | None = None, multiSelect: bool = False):
+		self.adElement(listbox.ListBox, self.panel, label, choices, onSelect = onSelect, multiSelect = multiSelect)
+
 
 	def removeElement(self, element):
 		if not element in self.elements.values(): return
@@ -93,8 +97,6 @@ class Window:
 			sizer.Add(element, proportion=1, flag=wx.EXPAND | wx.ALL, border=self.borderWidth)
 		self.panel.SetSizer(sizer)
 		self.frame.Layout()
-
-
 
 	@property
 	def shown(self):
