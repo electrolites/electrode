@@ -3,7 +3,7 @@ Window class for electrode.
 """
 from typing import Callable
 import wx
-from electrode.gui.elements import input, checkbox, button, slider, combobox, spinbutton, listbox, radiobuttons
+from electrode.gui.elements import input, checkbox, button, slider, combobox, spinbutton, listbox, radiobuttons, progressbar
 
 class Window:
 	def __init__(self, title: str, app: wx.App | None = None, orientation: wx.VERTICAL | wx.HORIZONTAL = wx.HORIZONTAL, borderWidth: int = 10):
@@ -50,7 +50,8 @@ class Window:
 
 	def adElement(self, element, *args, **kwargs):
 		textLabel = wx.StaticText(self.panel, label = args[1])
-		self.elements[textLabel]=element(*args, **kwargs)
+		element = element(*args, **kwargs)
+		self.elements[textLabel]=element
 		self._updateLayout()
 		return element
 
@@ -77,6 +78,9 @@ class Window:
 
 	def adRadioButtons(self, label: str, choices: list[str], onSelect: Callable | None =None):
 		self.adElement(radiobuttons.RadioButtons, self.panel, label, choices, onSelect = onSelect)
+
+	def adProgressBar(self, label: str, maxValue: int = 100, vertical: bool = True):
+		return self.adElement(progressbar.ProgressBar, self.panel, label, maxValue = maxValue, vertical = vertical)
 
 	def removeElement(self, element):
 		if not element in self.elements.values(): return
