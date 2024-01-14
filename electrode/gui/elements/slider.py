@@ -17,7 +17,6 @@ class Slider(wx.Slider):
 			self.Bind(wx.EVT_SLIDER, onChange)
 		self.Bind(wx.EVT_KEY_DOWN, self._onKey)
 
-
 	def _onKey(self, wxEvent: wx.Event):
 		code = wxEvent.GetKeyCode()
 		value=self.GetValue()
