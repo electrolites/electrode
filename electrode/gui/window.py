@@ -3,7 +3,7 @@ Window class for electrode.
 """
 from typing import Callable
 import wx
-from electrode.gui.elements import input, checkbox, button, slider, combobox, spinbutton, listbox, radiobuttons, progressbar
+from electrode.gui.elements import input, checkbox, button, slider, combobox, spinbutton, listbox, radiobuttons, progressbar, treeview
 
 class Window:
 	def __init__(self, title: str, app: wx.App | None = None, orientation: wx.VERTICAL | wx.HORIZONTAL = wx.HORIZONTAL, borderWidth: int = 10):
@@ -24,7 +24,7 @@ class Window:
 		if self.shown: return
 		self.frame.Show(True)
 		children=self.panel.GetChildren()
-		children[0].SetFocus()
+		if len(children)>0: children[0].SetFocus()
 
 	def hide(self):
 		if not self.shown: return
@@ -68,7 +68,7 @@ class Window:
 		return self.adElement(slider.Slider, self.panel, label, minValue=minValue, maxValue=maxValue, initialValue=initialValue, onChange=onChange, vertical = vertical)
 
 	def adComBobox(self, label: str, choices: list[str], initialSelection: int = 0, onSelect: Callable | None = None, readOnly: bool =True):
-		self.adElement(combobox.ComboBox, self.panel, label, choices=choices.copy(), initialSelection = initialSelection, onSelect = onSelect, readOnly = readOnly)
+		return self.adElement(combobox.ComboBox, self.panel, label, choices=choices.copy(), initialSelection = initialSelection, onSelect = onSelect, readOnly = readOnly)
 
 	def adSpinButton(self, label: str, initialValue: int = 0, minValue: int = 0, maxValue: int = 100, aeros: bool = True, wrap: bool = False):
 		return self.adElement(spinbutton.SpinButton, self.panel, label, initialValue = initialValue, minValue = minValue, maxValue = maxValue,  aeros = aeros, wrap = wrap)
@@ -81,6 +81,9 @@ class Window:
 
 	def adProgressBar(self, label: str, maxValue: int = 100, vertical: bool = True):
 		return self.adElement(progressbar.ProgressBar, self.panel, label, maxValue = maxValue, vertical = vertical)
+
+	def adTreeView(self, label: str, onSelect: Callable | None = None, onCollapse: Callable | None = None, onExpande: Callable | None = None, onActivate: Callable | None = None, allowMultiSelect: bool  = False, banishRootNode: bool = True):
+		return self.adElement(treeview.TreeView, self.panel, label, onSelect = onSelect, onCollapse = onCollapse, onExpande = onExpande, onActivate = onActivate, allowMultiSelect = allowMultiSelect, banishRootNode = banishRootNode)
 
 	def removeElement(self, element):
 		if not element in self.elements.values(): return
@@ -96,13 +99,16 @@ class Window:
 				child.Destroy()
 		sizer.Clear()
 		for labelText, element in self.elements.items():
+			elementSizer=wx.BoxSizer(self.orientation)
 			existingSizer, textSizer=element.GetContainingSizer(), labelText.GetContainingSizer()
 			if textSizer is not None: textSizer.Detach(labelText)
-			sizer.Add(labelText, proportion=1, flag=wx.ALL, border=self.borderWidth)
+			elementSizer.Add(labelText, proportion=1, flag=wx.ALL, border=self.borderWidth)
 			if existingSizer is not None: existingSizer.Detach(element)
-			sizer.Add(element, proportion=1, flag=wx.EXPAND | wx.ALL, border=self.borderWidth)
+			elementSizer.Add(element, proportion=1, flag=wx.EXPAND | wx.ALL, border=self.borderWidth)
+			sizer.Add(elementSizer, proportion=1, flag=wx.EXPAND | wx.ALL, border=self.borderWidth)
 		self.panel.SetSizer(sizer)
 		self.frame.Layout()
+		self.frame.Fit()
 
 	@property
 	def shown(self):
