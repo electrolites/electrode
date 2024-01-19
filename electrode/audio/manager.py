@@ -6,14 +6,13 @@ import cyal
 from .pool import pool as Pool
 from .sound import Sound
 from .group import Group, soundFactoryType
-from electrode.utils import convertToCyalCoordinates
 
 class Manager:
 	def __init__(self, path: str, device: cyal.Device | None=None, context: cyal.Context | None=None):
 		self.device = device or cyal.Device()
 		self.context=context or cyal.Context(self.device, make_current=True, hrtf_soft=1)
 		self.alListener=self.context.listener
-		self.alListener.orientation = [0, 0, -1, 0, 1, 0]
+		self.alListener.orientation = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
 		self.alListener.position = [0, 0, 0]
 		self.pool=Pool(self.context, path)
 		self.oneShotSounds: list[Sound]=[]
@@ -59,7 +58,7 @@ class Manager:
 
 	@listenerPosition.setter
 	def listenerPosition(self, val: list[float]):
-		self.alListener.position=convertToCyalCoordinates(val[0], val[1], val[2])
+		self.alListener.position=val
 
 	@property
 	def listenerX(self) -> float: return self.listenerPosition[0]

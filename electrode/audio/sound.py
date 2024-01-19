@@ -2,7 +2,6 @@
 Sound class for electrode.
 """
 import cyal
-from electrode.utils import convertToCyalCoordinates
 
 class Sound:
 	def __init__(self, context: cyal.Context, buffer: cyal.Buffer, **kwargs):
@@ -28,29 +27,37 @@ class Sound:
 
 	@property
 	def y(self):
-		return self.alSource.position[2]
+		return self.alSource.position[1]
 
 	@y.setter
 	def y(self, val: float):
 		pos=self.alSource.position
-		self.alSource.position=[pos[0], pos[1], val*-1]
+		self.alSource.position=[pos[0], val, pos[2]]
 
 	@property
 	def z(self):
-		return self.alSource.position[1]
+		return self.alSource.position[2]
 
 	@z.setter
 	def z(self, val: float):
 		pos=self.alSource.position
-		self.alSource.position=[pos[0], val, pos[2]]
+		self.alSource.position=[pos[0], pos[1], val]
 
 	@property
 	def position(self):
-		return [self.alSource.position[0], self.alSource.position[2]*-1, self.alSource.position[1]]
+		return self.alSource.position
 
 	@position.setter
 	def position(self, val):
-		self.alSource.position=convertToCyalCoordinates(*val)
+		self.alSource.position=val
+
+	@property
+	def direction(self):
+		return self.alSource.direction
+
+	@direction.setter
+	def direction(self, val):
+		self.alSource.direction=val
 
 	@property
 	def pitch(self):
