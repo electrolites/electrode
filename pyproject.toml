@@ -14,6 +14,7 @@ numpy = "^1.26.2"
 webcolors = "^1.13"
 accessible-output2 = "^0.17"
 wxpython = "^4.2.1"
+soundfile = "^0.12.1"
 
 
 [build-system]

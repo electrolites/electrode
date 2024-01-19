@@ -2,10 +2,8 @@
 Electrodes Sound pool class.
 """
 import os
-import array
 import cyal
-from pydub import AudioSegment
-from pydub.utils import get_array_type
+import soundfile
 
 class pool:
 	def __init__(self, context: cyal.context, path: str):
@@ -22,12 +20,12 @@ class pool:
 
 	def getBufferFromFile(self, file: str):
 		file=self.path+file
-		segment=AudioSegment.from_file(file)
-		segment.set_sample_width(2)  
-		format=cyal.BufferFormat.MONO16 if segment.channels==1 else cyal.BufferFormat.STEREO16
+		fileObject=soundfile.SoundFile(file,'r')
+		format=cyal.BufferFormat.MONO16 if fileObject.channels==1 else cyal.BufferFormat.STEREO16
 		buffer = self.context.gen_buffer()
-		data=segment.raw_data
-		buffer.set_data(data, sample_rate=segment.frame_rate, format=format)
+		data=fileObject.read(dtype='int16').tobytes()
+		fileObject.close()
+		buffer.set_data(data, sample_rate=fileObject.samplerate, format=format)
 		return buffer
 
 	def clear(self):

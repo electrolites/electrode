@@ -2,7 +2,7 @@
 Sound class for electrode.
 """
 import cyal
-from utils import convertToCyalCoordinates
+from electrode.utils import convertToCyalCoordinates
 
 class Sound:
 	def __init__(self, context: cyal.Context, buffer: cyal.Buffer, **kwargs):

@@ -6,7 +6,7 @@ import cyal
 from .pool import pool as Pool
 from .sound import Sound
 from .group import Group, soundFactoryType
-from utils import convertToCyalCoordinates
+from electrode.utils import convertToCyalCoordinates
 
 class Manager:
 	def __init__(self, path: str, device: cyal.Device | None=None, context: cyal.Context | None=None):
