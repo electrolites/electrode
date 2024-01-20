@@ -4,7 +4,7 @@ Electrodes Sound pool class.
 import os
 import cyal
 import soundfile
-from electrode.audio.generators import sine, square, sawtooth, triangle, whiteNoise, brownNoise, pinkNoise
+from electrode.audio.generators import sine, square, sawtooth, triangle, whiteNoise, brownNoise, pinkNoise, speech
 
 class pool:
 	def __init__(self, context: cyal.context, path: str):
@@ -39,6 +39,7 @@ class pool:
 			case "whitenoise": generator=whiteNoise.WhiteNoise(*args, **kwargs)
 			case "brownnoise": generator=brownNoise.BrownNoise(*args, **kwargs)
 			case "pinknoise": generator = pinkNoise.PinkNoise(*args, **kwargs)
+			case "speech": generator=speech.Speech(*args, **kwargs)
 		buffer=self.context.gen_buffer()
 		format=cyal.BufferFormat.MONO16 if generator.channels==1 else cyal.BufferFormat.STEREO16
 		buffer.set_data(generator.data, sample_rate=generator.sampleRate, format=format)
