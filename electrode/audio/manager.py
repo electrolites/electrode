@@ -18,15 +18,24 @@ class Manager:
 		self.oneShotSounds: list[Sound]=[]
 		self.sounds: list[Sound]=[]
 
-	def newSound(self, filePath: str, OneShot= False, **kwargs):
+	def newSound(self, filePath: str, oneShot= False, **kwargs):
 		s=Sound(self.context,self.pool.get(filePath),**kwargs)
-		if OneShot==True:
+		if oneShot==True:
 			if s.looping==True: raise ValueError("Looping must be False if oneShot is true.")
 			self.oneShotSounds.append(s)
 		else: self.sounds.append(s)
 		return s
 
 	def newOneShotSound(self, filePath: str, **kwargs): return self.newSound(filePath, True, **kwargs)
+
+	def newGeneration(self, genoraterType: str, *args, oneShot: bool = False, **kwargs):
+		buffer=self.pool.generate(genoraterType, *args, **kwargs)
+		s=Sound(self.context, buffer, **kwargs)
+		if oneShot==True:
+			if s.looping==True: raise ValueError("Looping must be False if oneShot is true.")
+			self.oneShotSounds.append(s)
+		else: self.sounds.append(s)
+		return s
 
 	def newGroup(self, soundFactory: soundFactoryType|None=None, **defaults):
 		if soundFactory is None: soundFactory=self.newOneShotSound
