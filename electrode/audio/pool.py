@@ -4,7 +4,7 @@ Electrodes Sound pool class.
 import os
 import cyal
 import soundfile
-from electrode.audio.generators import sine, square, sawtooth
+from electrode.audio.generators import sine, square, sawtooth, triangle
 
 class pool:
 	def __init__(self, context: cyal.context, path: str):
@@ -35,6 +35,7 @@ class pool:
 			case "sine": generator=sine.Sine(*args, **kwargs)
 			case "square": generator=square.Square(*args, **kwargs)
 			case "sawtooth": generator = sawtooth.Sawtooth(*args, **kwargs)
+			case "triangle": generator=triangle.Triangle(*args, **kwargs)
 		buffer=self.context.gen_buffer()
 		format=cyal.BufferFormat.MONO16 if generator.channels==1 else cyal.BufferFormat.STEREO16
 		buffer.set_data(generator.data, sample_rate=generator.sampleRate, format=format)
