@@ -6,6 +6,10 @@ import cyal
 import soundfile
 from electrode.audio.generators import sine, square, sawtooth, triangle, whiteNoise, brownNoise, pinkNoise, speech
 from electrode.audio.pack import Pack
+try:
+	from electrode.audio.generators import gspeech
+except ModuleNotFoundError:
+	pass
 
 class pool:
 	def __init__(self, context: cyal.context, path: str, key: str = ""):
@@ -26,7 +30,7 @@ class pool:
 
 	def getBufferFromFile(self, file: str):
 		file=self.path+file
-		if not hasattr(self, "pack"): fileObject=soundfile.SoundFile(file,'r')
+		if not hasattr(self, "pack"): fileObject=soundfile.SoundFile(file, 'r')
 		elif file in self.pack.data.keys(): fileObject = soundfile.SoundFile(self.pack.data[file], 'r')
 		format=cyal.BufferFormat.MONO16 if fileObject.channels==1 else cyal.BufferFormat.STEREO16
 		buffer = self.context.gen_buffer()
@@ -46,6 +50,9 @@ class pool:
 			case "brownnoise": generator=brownNoise.BrownNoise(*args, **kwargs)
 			case "pinknoise": generator = pinkNoise.PinkNoise(*args, **kwargs)
 			case "speech": generator=speech.Speech(*args, **kwargs)
+			case "gspeech":
+				try: generator = gspeech.GSpeech(*args, **kwargs)
+				except NameError: raise RuntimeError('You must install the gtts python package before using the GSpeech generator.')
 		buffer=self.context.gen_buffer()
 		format=cyal.BufferFormat.MONO16 if generator.channels==1 else cyal.BufferFormat.STEREO16
 		buffer.set_data(generator.data, sample_rate=generator.sampleRate, format=format)
