@@ -1,5 +1,5 @@
 """
-text to speech generator for electrode.
+Google text to speech generator for electrode.
 """
 import gtts
 from io import BytesIO
