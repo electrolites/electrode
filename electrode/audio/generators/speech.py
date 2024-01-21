@@ -9,6 +9,7 @@ from electrode.audio.generators.generator import Generator
 class Speech(Generator):
 	def generate(self, text: str, **kwargs):
 		engine=pyttsx4.Engine()
+		print(dir(engine.tts))
 		bio = BytesIO()
 		engine.save_to_file(text, bio, "w.wave")
 		engine.runAndWait()
