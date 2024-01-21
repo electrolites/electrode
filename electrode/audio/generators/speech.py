@@ -2,20 +2,20 @@
 text to speech generator for electrode.
 """
 import pyttsx4
-from io import BytesIO
+from io import BufferedReader, BytesIO
+import tempfile
 import soundfile
 from electrode.audio.generators.generator import Generator
 
 class Speech(Generator):
 	def generate(self, text: str, **kwargs):
+		tfile=tempfile.NamedTemporaryFile('r')
+		tempname = tfile.name
+		tfile.close()
 		engine=pyttsx4.Engine()
-		print(dir(engine.tts))
-		bio = BytesIO()
-		engine.save_to_file(text, bio, "w.wave")
+		engine.save_to_file(text, tempname, )
 		engine.runAndWait()
-		signal = bio.getvalue()
-		bio.seek(0)
-		#with soundfile.SoundFile(bio) as f:
-#			rate = f.samplerate
-		bio.close()
-		return signal, 22000, 1
+		signal, rate = soundfile.read(tempname, dtype = 'int16')
+		tfile.delete = True
+		signal = signal.tobytes()
+		return signal, rate, 1
