@@ -16,6 +16,7 @@ class GSpeech(Generator):
 		byo = BytesIO()
 		engine.write_to_fp(byo)
 		byo.seek(0)
-		signal, rate = soundfile.read(byo, dtype = 'int16')
-		signal = signal.tobytes()
-		return signal, rate, 1
+		with soundfile.SoundFile(byo, 'r') as sfile:
+			signal= sfile.read(dtype = 'int16')
+			signal = signal.tobytes()
+			return signal, sfile.samplerate, sfile.channels

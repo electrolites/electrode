@@ -1,5 +1,5 @@
 """
-text to speech generator for electrode.
+Text to speech generator for electrode.
 """
 import pyttsx4
 from io import BufferedReader, BytesIO
@@ -15,7 +15,8 @@ class Speech(Generator):
 		engine=pyttsx4.Engine()
 		engine.save_to_file(text, tempname, )
 		engine.runAndWait()
-		signal, rate = soundfile.read(tempname, dtype = 'int16')
-		tfile.delete = True
-		signal = signal.tobytes()
-		return signal, rate, 1
+		with soundfile.SoundFile(tempname, 'r') as sfile:
+			signal = sfile.read(dtype = 'int16')
+			tfile.delete = True
+			signal = signal.tobytes()
+			return signal, sfile.samplerate, sfile.channels
