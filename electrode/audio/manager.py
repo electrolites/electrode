@@ -8,13 +8,13 @@ from .sound import Sound
 from .group import Group, soundFactoryType
 
 class Manager:
-	def __init__(self, path: str, device: cyal.Device | None=None, context: cyal.Context | None=None):
+	def __init__(self, path: str, key: str = "", device: cyal.Device | None=None, context: cyal.Context | None=None):
 		self.device = device or cyal.Device()
 		self.context=context or cyal.Context(self.device, make_current=True, hrtf_soft=1)
 		self.alListener=self.context.listener
 		self.alListener.orientation = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
 		self.alListener.position = [0, 0, 0]
-		self.pool=Pool(self.context, path)
+		self.pool=Pool(self.context, path, key = key)
 		self.oneShotSounds: list[Sound]=[]
 		self.sounds: list[Sound]=[]
 
