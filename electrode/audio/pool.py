@@ -52,7 +52,7 @@ class pool:
 			case "speech": generator=speech.Speech(*args, **kwargs)
 			case "gspeech":
 				try: generator = gspeech.GSpeech(*args, **kwargs)
-				except NameError: raise RuntimeError('You must install the gtts python package before using the GSpeech generator.')
+				except NameError: raise RuntimeError('You must install the gtts python package before using the GSpeech generator. try:\n poetry install with more_tts')
 		buffer=self.context.gen_buffer()
 		format=cyal.BufferFormat.MONO16 if generator.channels==1 else cyal.BufferFormat.STEREO16
 		buffer.set_data(generator.data, sample_rate=generator.sampleRate, format=format)
