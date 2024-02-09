@@ -5,14 +5,14 @@ Event class for electrode.
 import asyncio
 from collections import defaultdict
 from typing import Any, Coroutine, Protocol
-
+from pydantic import ValidationError, create_model
 from electrode.events.errors import eventExistsError, eventMissingError, invalidEventError
 
 class eventManager:
 	"""
 	Class for subscribing to, registering,  and unregistering events
 	"""
-	async def __init__(self):
+	def __init__(self):
 		"""
 		Initializes the event manager.
 		"""
@@ -53,16 +53,20 @@ class eventManager:
 		self.registered.pop(event)
 		self.subscribers.pop(event)
 
-	async def postEvent(self, event: str, data: Any) -> None:
+	async def postEvent(self, event: str, **data) -> None:		
 		"""
 		Posts an event to its subscribers.
 
 		:param event: The name of the event to post.
 		:type event: str
 		:param data: The extra data to go alon with the event.
-		:type data: Any
+		:raises eventMissingError: when an event has not yet been registered.
+		:raises invalidEventError: when the event data does not match the registered event datas types.
 		"""
 		if event not in self.registered.keys(): raise eventMissingError(f'The event {event} does not exist.', event)
-		if not isinstance(data, self.registered[event]): raise invalidEventError(f'The event {event} did not matche its registered protocol.', event)
+		for key,value in data.items():
+			if key not in self.registered[event].__annotations__: raise invalidEventError(f'The event {event} did not matche its registered protocol. It got a value for {key}, which does not exist in its registered protocol.', event)
+			if isinstance(value, self.registered[event].__annotations__[key]): continue
+			raise invalidEventError(f'The event {event} did not matche its registered protocol. It was expecting the key {key} to be of type {self.registered[event]} but it was of type {type(value)}', event)
 		if event not in self.subscribers.keys(): return
 		await asyncio.gather(*[e(data) for e in self.subscribers[event]])

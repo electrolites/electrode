@@ -1,10 +1,15 @@
 from electrode.gui.window import Window
-from electrode.gui.elements import input
-import wx
+from electrode.events.event import eventManager
+import time
+from typing import Protocol, runtime_checkable
+import asyncio
 progress = 0
+manager = eventManager()
 
-def main():
+async def main():
 	global progress
+	await manager.register("start", startEvent)
+	await manager.subscribe("start", onStartEvent)
 	window=Window("test")
 	window.adInput("this is a text fealed")
 	window.adCheckBox("test your box", initialState=2, threeWay=True)
@@ -24,7 +29,9 @@ def main():
 	tree.AppendItem(branch2,"leef 3")
 	tree.AppendItem(branch2,"leef 4")
 	window.show()
+	await manager.postEvent("start", time = time.time(), something = "this is a dumb statement")
 	window.app.MainLoop()
+
 
 def buttonTest(event):
 	print(event)
@@ -35,5 +42,13 @@ def sliderTest(event):
 	print(value)
 	progress.SetValue(value)
 
+@runtime_checkable
+class startEvent(Protocol):
+	time: float
+	something: str
 
-main()
+async def onStartEvent(event):
+	print(f'application started at {event["time"]}, with a string thing of {event["something"]}')
+
+
+asyncio.run(main())
