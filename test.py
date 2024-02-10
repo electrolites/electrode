@@ -30,7 +30,7 @@ async def main():
 	tree.AppendItem(branch2,"leef 4")
 	window.show()
 	await manager.postEvent("start", time = time.time(), something = "this is a dumb statement")
-	window.app.MainLoop()
+	await window.app.MainLoop()
 
 
 def buttonTest(event):
