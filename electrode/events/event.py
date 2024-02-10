@@ -5,7 +5,6 @@ Event class for electrode.
 import asyncio
 from collections import defaultdict
 from typing import Any, Coroutine, Protocol
-from pydantic import ValidationError, create_model
 from electrode.events.errors import eventExistsError, eventMissingError, invalidEventError
 
 class eventManager:
