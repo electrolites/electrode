@@ -26,7 +26,7 @@ class Window:
 		if self.shown: return
 		self.frame.Show(True)
 		children=self.panel.GetChildren()
-		if len(children)>0: wx.CallAfter(children[0].SetFocus)
+		if len(children)>0: children[0].SetFocus()
 
 	def hide(self):
 		if not self.shown: return
