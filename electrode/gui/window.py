@@ -136,3 +136,7 @@ class Window:
 	def title(self, value: str):
 		self._title=value
 		self.frame.SetTitle(value)
+
+	@property
+	def focused(self):
+		return self.frame.HasFocus()
