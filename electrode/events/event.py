@@ -5,7 +5,9 @@ Event class for electrode.
 import asyncio
 from collections import defaultdict
 from typing import Any, Coroutine, Protocol
-from electrode.events.errors import eventExistsError, eventMissingError, invalidEventError
+import electrode
+from electrode.events.errors import eventExistsError, eventMissingError, invalidEventError, invalidRequirementsError
+from electrode.events.subscriber import Subscriber
 
 class eventManager:
 	"""
@@ -15,7 +17,7 @@ class eventManager:
 		"""
 		Initializes the event manager.
 		"""
-		self.subscribers = defaultdict(list)
+		self.subscribers = defaultdict(list [Subscriber])
 		self.registered={}
 
 	async def register(self, event: str, structure: Protocol):
@@ -30,7 +32,7 @@ class eventManager:
 		if event in self.registered.keys(): raise eventExistsError(event, self.registered[event], structure)
 		self.registered[event] = structure
 
-	async def subscribe(self, event: str, callBack: Coroutine):
+	async def subscribe(self, event: str, callBack: Coroutine, requirements: dict = {}):
 		"""
 		Subscribes to an event.
 
@@ -38,9 +40,16 @@ class eventManager:
 		:type event: str
 		:param callBack: The function that is awaited upon the execution of the event.
 		:type callBack: Coroutine
+		:param requirements: The data that is required for this callBack
+		:type requirements: dict
 		"""
 		if event not in self.registered.keys(): raise eventMissingError(f'The event {event} does not exist.', event)
-		self.subscribers[event].append(callBack)
+		structure = self.registered[event]
+		for k in requirements.keys():
+			if k in structure.__annotations__: continue
+			raise invalidRequirementsError(f'The requirement {k} is not valid because it is not with in the registered structure for the {event} event.', requirements)
+		subscriber = Subscriber(callBack, requirements)
+		self.subscribers[event].append(subscriber)
 
 	async def unregister(self, event: str):
 		"""
@@ -52,7 +61,7 @@ class eventManager:
 		self.registered.pop(event)
 		self.subscribers.pop(event)
 
-	async def postEvent(self, event: str, **data) -> None:		
+	async def postEvent(self, event: str, **data) -> None:
 		"""
 		Posts an event to its subscribers.
 
@@ -68,4 +77,13 @@ class eventManager:
 			if isinstance(value, self.registered[event].__annotations__[key]): continue
 			raise invalidEventError(f'The event {event} did not matche its registered protocol. It was expecting the key {key} to be of type {self.registered[event]} but it was of type {type(value)}', event)
 		if event not in self.subscribers.keys(): return
-		await asyncio.gather(*[e(data) for e in self.subscribers[event]])
+		await asyncio.gather(*[e.Callback(data) for e in self.subscribers[event] if e.requirements.items() in data.items()])
+
+	def isRegistered(self, event: str):
+		"""
+		Checks if an event is already registered.
+
+		:param event: The event to look for.
+		:type event: str
+		"""
+		return event in self.registered.keys()

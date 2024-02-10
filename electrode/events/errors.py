@@ -45,7 +45,7 @@ class eventMissingError(Exception):
 
 class invalidEventError(Exception):
 	"""
-	Error that is rased when an event does not match certain criteria.
+	Error that is razed when an event does not match certain criteria.
 	"""
 	def __init__(self, message: str, event: str) -> None:
 		"""
@@ -58,4 +58,21 @@ class invalidEventError(Exception):
 		"""
 		self.event = event
 		self.message = message
+		super().__init__(self.message)
+
+class invalidRequirementsError(Exception):
+	"""
+	Error that is razed when provided requirements go out side an events registration.
+	"""
+	def __init__(self, message: str, requirements: dict):
+		"""
+		initialize the invalid requirements error.
+
+		:param message: The message for the exception.
+		:type message: str
+		:param requirements: The requirements that failed to pass the check.
+		:type requirements: dict
+		"""
+		self.message = message
+		self.requirements = requirements
 		super().__init__(self.message)
