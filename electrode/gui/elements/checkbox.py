@@ -11,3 +11,4 @@ class CheckBox(wx.CheckBox):
 		if initialState==1 or initialState>1 and not threeWay: self.SetValue(True)
 		elif initialState>1 and threeWay: self.Set3StateValue(wx.CHK_UNDETERMINED)
 		else: self.SetValue(False)
+

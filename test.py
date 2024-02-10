@@ -32,11 +32,10 @@ async def main():
 	await manager.postEvent("start", time = time.time(), something = "this is a dumb statement")
 	await window.app.MainLoop()
 
-
-def buttonTest(event):
+async def buttonTest(event):
 	print(event)
 
-def sliderTest(event):
+async def sliderTest(event):
 	global progress
 	value = event.GetEventObject().GetValue()
 	print(value)
