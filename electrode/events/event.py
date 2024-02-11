@@ -74,8 +74,9 @@ class eventManager:
 		if event not in self.registered.keys(): raise eventMissingError(f'The event {event} does not exist.', event)
 		for key,value in data.items():
 			if key not in self.registered[event].__annotations__: raise invalidEventError(f'The event {event} did not matche its registered protocol. It got a value for {key}, which does not exist in its registered protocol.', event)
+			if self.registered[event].__annotations__[key] is Any: continue
 			if isinstance(value, self.registered[event].__annotations__[key]): continue
-			raise invalidEventError(f'The event {event} did not matche its registered protocol. It was expecting the key {key} to be of type {self.registered[event]} but it was of type {type(value)}', event)
+			raise invalidEventError(f'The event {event} did not matche its registered protocol. It was expecting the key {key} to be of type {self.registered[event].__annotations__[key]} but it was of type {type(value)}', event)
 		if event not in self.subscribers.keys(): return
 		await asyncio.gather(*[e.Callback(data) for e in self.subscribers[event] if e.requirements.items() in data.items()])
 

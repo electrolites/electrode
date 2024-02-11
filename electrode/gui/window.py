@@ -2,22 +2,24 @@
 Window class for electrode.
 """
 from typing import Callable
-import threading
 import wx
 import wxasync
 from electrode.gui.elements import input, checkbox, button, slider, combobox, spinbutton, listbox, radiobuttons, progressbar, treeview
+from electrode.gui.bridge import eventFrame
+from electrode.events.event import eventManager
 
 class Window:
-	def __init__(self, title: str, app: wxasync.WxAsyncApp | None = None, orientation: wx.VERTICAL | wx.HORIZONTAL = wx.HORIZONTAL, borderWidth: int = 10):
+	def __init__(self, title: str, eventManager :eventManager, app: wxasync.WxAsyncApp | None = None, orientation: wx.VERTICAL | wx.HORIZONTAL = wx.HORIZONTAL, borderWidth: int = 10):
 		self.app = app or wxasync.WxAsyncApp(sleep_duration= 0.002)
 		self._title=title
 		self.orientation=orientation
 		self.borderWidth=borderWidth
 		self.elements={}
+		self.eventManager = eventManager
 		self._initUi()
 
 	def _initUi(self):
-		self.frame=wx.Frame(None, title=self._title)
+		self.frame=eventFrame.EventFrame( self.eventManager, None, title=self._title)
 		self.panel=wx.Panel(self.frame, name=self.title)
 		self.frame.SetSize(600, 800)
 		self.frame.Center()

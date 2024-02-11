@@ -1,12 +1,10 @@
 """
 Wx event protocol for electrode.
 """
-from typing import Any, Protocol
+from typing import Any, Protocol, runtime_checkable
 from wx import Event as wxPythonEvent
 
+@runtime_checkable
 class WxEvent(Protocol):
-	"""
-	Protocol class for registering wx events with electrodes event system.
-	"""
+	wxObject: Any
 	wxEvent: wxPythonEvent
-	object: Any

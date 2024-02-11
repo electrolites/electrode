@@ -10,7 +10,7 @@ async def main():
 	global progress
 	await manager.register("start", startEvent)
 	await manager.subscribe("start", onStartEvent)
-	window=Window("test")
+	window=Window("test", manager)
 	window.adInput("this is a text fealed")
 	window.adCheckBox("test your box", initialState=2, threeWay=True)
 	window.adButton("test your button", buttonTest)
