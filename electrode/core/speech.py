@@ -3,7 +3,7 @@ Speech classes for electrode.
 """
 from accessible_output3 import outputs
 
-class speech:
+class Speech:
 	"""
 	Class for speaking and brailling output.
 	"""
@@ -61,7 +61,7 @@ class speech:
 		"""
 		self.output.braille(text)
 
-	def output(self, text: str, interrupt: bool = True):
+	def both(self, text: str, interrupt: bool = True):
 		"""
 		Outputs the given text thrue speech and Braill.
 
@@ -70,4 +70,5 @@ class speech:
 		:param interrupt: Sets if the spoken text should interrupt the currently speaking text, defaults to True
 		:type interrupt: bool, optional
 		"""
-		self.output.output(text, intterrupt = interrupt)
+		self.output.speak(text, interrupt = interrupt)
+		self.output.braille(text)
