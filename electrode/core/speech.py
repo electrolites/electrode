@@ -1,7 +1,7 @@
 """
 Speech classes for electrode.
 """
-from accessible_output2.outputs import auto
+from accessible_output3.outputs import auto
 
 class speaker:
 	def speak(self,text: str):
