@@ -1,7 +1,11 @@
 import json
 
 class Translator:
-	def __init__(self):
+	"""
+	Translation class for electrode.
+	"""
+	def __init__(self, translationDirectory: str = ""):
+		self.directory = translationDirectory
 		self.cache = {}
 
 	def load(self, lang):
@@ -9,13 +13,12 @@ class Translator:
 			return self.cache[lang]
 
 		try:
-			with open(f"{lang}.json") as f:
+			with open(f"{self.directory}{lang}.json") as f:
 				translation_data = json.load(f)
 				self.cache[lang] = translation_data
 				return translation_data
 		except FileNotFoundError as e:
-			raise FileNotFoundError(
-				f"Error: Translation file '{lang}.json' not found.")
+			raise FileNotFoundError(f"Error: Translation file '{lang}.json' not found.")
 
 	def translate(self, key, lang, **kwargs):
 		translation_data = self.load(lang)
