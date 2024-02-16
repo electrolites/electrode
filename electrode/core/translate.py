@@ -18,7 +18,7 @@ class Translator:
 				self.cache[lang] = translation_data
 				return translation_data
 		except FileNotFoundError as e:
-			raise FileNotFoundError(f"Error: Translation file '{lang}.json' not found.")
+			raise FileNotFoundError(f"Error: Translation file '{self.directory}{lang}.json' not found.")
 
 	def translate(self, key, lang, **kwargs):
 		translation_data = self.load(lang)
