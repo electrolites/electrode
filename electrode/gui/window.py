@@ -10,7 +10,7 @@ from electrode.events.event import eventManager
 
 class Window:
 	def __init__(self, title: str, eventManager :eventManager, app: wxasync.WxAsyncApp | None = None, orientation: wx.VERTICAL | wx.HORIZONTAL = wx.HORIZONTAL, borderWidth: int = 10):
-		self.app = app or wxasync.WxAsyncApp(sleep_duration= 0.002)
+		self.app = app or wxasync.WxAsyncApp(sleep_duration= 0.0000001)
 		self._title=title
 		self.orientation=orientation
 		self.borderWidth=borderWidth
