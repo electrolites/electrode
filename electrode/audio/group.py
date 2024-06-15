@@ -5,7 +5,6 @@ from typing import Callable, Any
 from weakref import WeakSet
 from .sound import Sound
 from .pool import pool as Pool
-from utils import convertToCyalCoordinates
 
 soundFactoryType = Callable[[str, Any], Sound]
 
@@ -26,7 +25,7 @@ class Group:
 
 	def addSound(self, sound: Sound):
 		self.sounds.add(sound)
-		if not sound.direct: sound.position=convertToCyalCoordinates(self.position)
+		if not sound.direct: sound.position=self.position
 
 	def newSound(self, filePath: str, **kwargs):
 		sound=self.soundFactory(filePath, **{**self.defaults, **kwargs})
@@ -41,7 +40,7 @@ class Group:
 	def position(self, val: list):
 		self._position=val
 		for sound in self.sounds:
-			if not sound.direct: sound=convertToCyalCoordinates(*val)
+			if not sound.direct: sound=val
 
 	@property
 	def x(self):
