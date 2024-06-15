@@ -3,20 +3,24 @@ Window class for electrode.
 """
 from typing import Callable
 import wx
+import wxasync
 from electrode.gui.elements import input, checkbox, button, slider, combobox, spinbutton, listbox, radiobuttons, progressbar, treeview
+from electrode.gui.bridge import eventFrame
+from electrode.events.event import eventManager
 
 class Window:
-	def __init__(self, title: str, app: wx.App | None = None, orientation: wx.VERTICAL | wx.HORIZONTAL = wx.HORIZONTAL, borderWidth: int = 10):
-		self.app = app or wx.App()
+	def __init__(self, title: str, eventManager :eventManager, app: wxasync.WxAsyncApp | None = None, orientation: wx.VERTICAL | wx.HORIZONTAL = wx.HORIZONTAL, borderWidth: int = 10):
+		self.app = app or wxasync.WxAsyncApp(sleep_duration= 0.0000001)
 		self._title=title
 		self.orientation=orientation
 		self.borderWidth=borderWidth
-		self.frame=wx.Frame(None, title=self._title)
-		self.panel=wx.Panel(self.frame, name=self.title)
 		self.elements={}
+		self.eventManager = eventManager
 		self._initUi()
 
 	def _initUi(self):
+		self.frame=eventFrame.EventFrame( self.eventManager, None, title=self._title)
+		self.panel=wx.Panel(self.frame, name=self.title)
 		self.frame.SetSize(600, 800)
 		self.frame.Center()
 
@@ -134,3 +138,7 @@ class Window:
 	def title(self, value: str):
 		self._title=value
 		self.frame.SetTitle(value)
+
+	@property
+	def focused(self):
+		return self.frame.HasFocus()

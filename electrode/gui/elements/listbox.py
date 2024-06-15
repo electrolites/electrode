@@ -3,6 +3,7 @@
 Wraps wx list box for electrode.
 """
 import wx
+from wxasync import AsyncBind
 from typing import Callable
 
 class ListBox(wx.ListBox):
@@ -13,7 +14,7 @@ class ListBox(wx.ListBox):
 		super().__init__(parent, choices = choices, style = style)
 		self.SetLabel(label)
 		if onSelect is not None:
-			self.Bind(wx.EVT_LISTBOX, onSelect)
+			AsyncBind(wx.EVT_LISTBOX, onSelect, self)
 
 	def removeItem(self, item: str):
 		index = self.FindString(item)
@@ -26,4 +27,3 @@ class ListBox(wx.ListBox):
 	def deselectAll(self):
 		self.SetSelection(wx.NOT_FOUND)
 
-	
