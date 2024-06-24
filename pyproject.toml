@@ -17,6 +17,7 @@ soundfile = "^0.12.1"
 pyttsx4 = "^3.0.15"
 wxasync = "^0.49"
 accessible-output3 = "^0.1.2"
+vispy = "^0.14.3"
 
 [tool.poetry.group.more_tts]
 optional  = true
