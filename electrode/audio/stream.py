@@ -1,4 +1,5 @@
-from asyncio import sleep
+import asyncio
+import re
 
 import cyal
 
@@ -19,10 +20,15 @@ class Stream(Sound):
 		for key, value in kwargs.items():
 			setattr(self, key, value)
 
-	async def bufferData(self):
+	async def play(self):
 		self.seek(0)
+		self.alSource.unqueue_buffers()
+		buffs = self.context.gen_buffers(self.numberOfBuffers)
+		for buff in buffs: buff.set_data(self.read(), sample_rate = self.sampleRate, format = self.format)
+		self.alSource.queue_buffers(*buffs)
+		self.alSource.play()
 		while self.streaming():
-			await sleep(0.01)
+			await asyncio.sleep(self.getSleepDuration())
 			if self.alSource.buffers_processed > 0: self.alSource.unqueue_buffers(max = self.alSource.buffers_processed)
 			if not self.alSource.buffers_queued < self.numberOfBuffers: continue
 			buffs = self.context.gen_buffers(self.numberOfBuffers-self.alSource.buffers_queued)
@@ -37,3 +43,7 @@ class Stream(Sound):
 
 	def streaming(self):
 		pass
+
+	def getSleepDuration(self):
+		chunkDuration = self.bufferSize/self.sampleRate
+		return (chunkDuration*self.numberOfBuffers)-0.06

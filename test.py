@@ -32,13 +32,13 @@ async def main():
 	tree.AppendItem(branch2,"leef 3")
 	tree.AppendItem(branch2,"leef 4")
 	window.show()
+	stream = audioManager.newFileStream("mixer problems.flac")
 	await manager.postEvent("start", time = time.time(), something = "this is a dumb statement")
 	await window.app.MainLoop()
 
 async def buttonTest(event):
-	stream.play()
-	task = asyncio.create_task(stream.bufferData())
-	await task
+	await stream.play()
+
 
 async def sliderTest(event):
 	global progress
