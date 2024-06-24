@@ -1,14 +1,12 @@
-from io import BytesIO
 from asyncio import sleep
 
 import cyal
 
 from electrode.audio.sound import Sound
 
-class stream(Sound):
-	def __init__(self,  context: cyal.Context, dataStream: BytesIO,sampleRate: int, channels: int, bufferSize: int = 1024, numberOfBuffers: int = 3, **kwargs):
+class Stream(Sound):
+	def __init__(self,  context: cyal.Context, sampleRate: int, channels: int, bufferSize: int = 1024, numberOfBuffers: int = 3, **kwargs):
 		self.context = context
-		self.dataStream = dataStream
 		self.bufferSize = bufferSize
 		self.numberOfBuffers = numberOfBuffers
 		self.sampleRate = sampleRate
@@ -17,15 +15,25 @@ class stream(Sound):
 		self.alSource.spatialize = True
 		self.position=[0.0, 0.0, 0.0]
 		self._direct = False
+		self.playedOnce = False
 		for key, value in kwargs.items():
 			setattr(self, key, value)
 
 	async def bufferData(self):
-		self.dataStream.seek(0)
-		while self.dataStream:
+		self.seek(0)
+		while self.streaming():
 			await sleep(0.01)
 			if self.alSource.buffers_processed > 0: self.alSource.unqueue_buffers(max = self.alSource.buffers_processed)
 			if not self.alSource.buffers_queued < self.numberOfBuffers: continue
-			buffs = self.context.gen_buffers(self.numberOfBuffers-self.alSource.queued_buffers)
-			for buff in buffs: buff.set_data(self.dataStream.read(self.bufferSize), format = self.format)
+			buffs = self.context.gen_buffers(self.numberOfBuffers-self.alSource.buffers_queued)
+			for buff in buffs: buff.set_data(self.read(), sample_rate = self.sampleRate, format = self.format)
 			self.alSource.queue_buffers(*buffs)
+
+	def seek(self, amount: int):
+		pass
+
+	def read(self):
+		pass
+
+	def streaming(self):
+		pass

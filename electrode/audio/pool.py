@@ -29,15 +29,19 @@ class pool:
 		return self.cache[file]
 
 	def getBufferFromFile(self, file: str):
-		file=self.path+file
-		if not hasattr(self, "pack"): fileObject=soundfile.SoundFile(file, 'r')
-		elif file in self.pack.data.keys(): fileObject = soundfile.SoundFile(self.pack.data[file], 'r')
+		fileObject = self.getFile(file)
 		format=cyal.BufferFormat.MONO16 if fileObject.channels==1 else cyal.BufferFormat.STEREO16
 		buffer = self.context.gen_buffer()
 		data=fileObject.read(dtype='int16').tobytes()
 		fileObject.close()
 		buffer.set_data(data, sample_rate=fileObject.samplerate, format=format)
 		return buffer
+
+	def getFile(self, file: str):
+		file=self.path+file
+		if not hasattr(self, "pack"): fileObject=soundfile.SoundFile(file, 'r')
+		elif file in self.pack.data.keys(): fileObject = soundfile.SoundFile(self.pack.data[file], 'r')
+		return fileObject
 
 	def generate(self, generatorType: str, *args, **kwargs):
 		generator=0

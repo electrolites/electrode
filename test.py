@@ -1,13 +1,16 @@
 from electrode.gui.window import Window
 from electrode.events.event import eventManager
+from electrode.audio.manager import Manager as AudioManager
 import time
 from typing import Protocol, runtime_checkable
 import asyncio
 progress = 0
+stream = None
 manager = eventManager()
+audioManager = AudioManager("sounds")
 
 async def main():
-	global progress
+	global progress, stream
 	await manager.register("start", startEvent)
 	await manager.subscribe("start", onStartEvent)
 	window=Window("test", manager)
@@ -33,7 +36,9 @@ async def main():
 	await window.app.MainLoop()
 
 async def buttonTest(event):
-	print(event)
+	stream.play()
+	task = asyncio.create_task(stream.bufferData())
+	await task
 
 async def sliderTest(event):
 	global progress

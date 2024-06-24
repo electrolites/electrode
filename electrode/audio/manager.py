@@ -2,9 +2,12 @@
 Sound managment classes for Electrode.
 """
 from itertools import chain
+from asyncio import create_task
 import cyal
 from .pool import pool as Pool
 from .sound import Sound
+from .stream import Stream
+from .fileStream import FileStream
 from .group import Group, soundFactoryType
 
 class Manager:
@@ -17,6 +20,7 @@ class Manager:
 		self.pool=Pool(self.context, path, key = key)
 		self.oneShotSounds: list[Sound]=[]
 		self.sounds: list[Sound]=[]
+		self.streams: list[Stream] = []
 
 	def newSound(self, filePath: str, oneShot= False, **kwargs):
 		s=Sound(self.context,self.pool.get(filePath),**kwargs)
@@ -27,6 +31,11 @@ class Manager:
 		return s
 
 	def newOneShotSound(self, filePath: str, **kwargs): return self.newSound(filePath, True, **kwargs)
+
+	def newFileStream(self, filePath: str, **kwargs):
+		s = FileStream(self.context, self.pool.getFile(filePath), **kwargs)
+		self.streams.append(s)
+		return s
 
 	def newGeneration(self, genoraterType: str, *args, oneShot: bool = False, **kwargs):
 		buffer=self.pool.generate(genoraterType, *args, **kwargs)
@@ -40,6 +49,7 @@ class Manager:
 	def newGroup(self, soundFactory: soundFactoryType|None=None, **defaults):
 		if soundFactory is None: soundFactory=self.newOneShotSound
 		return Group(soundFactory, **defaults)
+
 
 	def tryCleanOneShots(self):
 		for s in self.oneShotSounds:
