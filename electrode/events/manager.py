@@ -5,8 +5,7 @@ Event class for electrode.
 import asyncio
 from collections import defaultdict
 from typing import Any, Coroutine
-from .errors import eventExistsError, eventMissingError, invalidEventError, invalidRequirementsError
-from .subscriber import Subscriber
+from .errors import eventExistsError, eventMissingError, invalidEventError
 
 class Manager:
 	"""
