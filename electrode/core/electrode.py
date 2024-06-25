@@ -20,5 +20,7 @@ class Electrode:
 		"""
 		self.eventManager = EventManager()
 		self.AsyncLoop = asyncio.get_event_loop()
-		self.AsyncLoop
 
+
+def genorateBuiltInEvents():
+	startEvent = {}

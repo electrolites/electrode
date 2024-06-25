@@ -18,14 +18,14 @@ class Manager:
 		self.subscribers = defaultdict(list [Coroutine])
 		self.registered={}
 
-	async def register(self, event: str, structure: dict):
+	async def register(self, event: str, structure: dict = {}):
 		"""
 		registers an event, setting up its required data.
 
 		:param event: The name of the event to register
 		:type event: str
-		:param structure: The required data for the event.
-		:type structure: dict
+		:param structure: The required data for the event, defaults to {}
+		:type structure: dict, optional
 		"""
 		if event in self.registered.keys(): raise eventExistsError(event, self.registered[event], structure)
 		self.registered[event] = structure
@@ -62,12 +62,14 @@ class Manager:
 		:raises invalidEventError: when the event data does not match the registered event datas types.
 		"""
 		if event not in self.registered.keys(): raise eventMissingError(f'The event {event} does not exist.', event)
-		for key,value in data.items():
-			if key not in self.registered[event].keys(): raise invalidEventError(f'The event {event} did not matche its registered protocol. It got a value for {key}, which does not exist in its registered protocol.', event)
-			if self.registered[event][key] is Any: continue
-			if isinstance(value, self.registered[event][key]): continue
-			raise invalidEventError(f'The event {event} did not matche its registered protocol. It was expecting the key {key} to be of type {self.registered[event][key]} but it was of type {type(value)}', event)
+		if data != {}:
+			for key,value in data.items():
+				if key not in self.registered[event].keys(): raise invalidEventError(f'The event {event} did not matche its registered protocol. It got a value for {key}, which does not exist in its registered protocol.', event)
+				if self.registered[event][key] is Any: continue
+				if isinstance(value, self.registered[event][key]): continue
+				raise invalidEventError(f'The event {event} did not matche its registered protocol. It was expecting the key {key} to be of type {self.registered[event][key]} but it was of type {type(value)}', event)
 		if event not in self.subscribers.keys(): return
+		elif self.registered[event] != {}: raise invalidEventError(f'The event {event} did not matche its registered protocol. It was expecting values for:\n {", ".join(self.registered[event].keys())}\n But it got empty data.', event)
 		await asyncio.gather(*[e(data) for e in self.subscribers[event] ])
 
 	def isRegistered(self, event: str):
