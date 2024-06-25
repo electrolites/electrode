@@ -4,7 +4,6 @@ enum Factory for electrode.
 
 from enum import Enum
 
-
 def CreateEnum(name: str, **kwargs):
 	"""
 	Creates an enum with spesified keys and values.

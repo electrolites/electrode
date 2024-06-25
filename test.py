@@ -1,13 +1,16 @@
 from electrode.gui.window import Window
 from electrode.events.event import eventManager
+from electrode.audio.manager import Manager as AudioManager
 import time
 from typing import Protocol, runtime_checkable
 import asyncio
 progress = 0
+stream = None
 manager = eventManager()
+audioManager = AudioManager("sounds")
 
 async def main():
-	global progress
+	global progress, stream
 	await manager.register("start", startEvent)
 	await manager.subscribe("start", onStartEvent)
 	window=Window("test", manager)
@@ -29,11 +32,13 @@ async def main():
 	tree.AppendItem(branch2,"leef 3")
 	tree.AppendItem(branch2,"leef 4")
 	window.show()
+	stream = audioManager.newFileStream("mixer problems.flac")
 	await manager.postEvent("start", time = time.time(), something = "this is a dumb statement")
 	await window.app.MainLoop()
 
 async def buttonTest(event):
-	print(event)
+	await stream.play()
+
 
 async def sliderTest(event):
 	global progress
