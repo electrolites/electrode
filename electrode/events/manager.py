@@ -4,7 +4,7 @@ Event class for electrode.
 
 import asyncio
 from collections import defaultdict
-from typing import Any, Coroutine, Protocol
+from typing import Any, Coroutine
 from .errors import eventExistsError, eventMissingError, invalidEventError, invalidRequirementsError
 from .subscriber import Subscriber
 
@@ -16,7 +16,7 @@ class Manager:
 		"""
 		Initializes the event manager.
 		"""
-		self.subscribers = defaultdict(list [Subscriber])
+		self.subscribers = defaultdict(list [Coroutine])
 		self.registered={}
 
 	async def register(self, event: str, structure: dict):
@@ -31,7 +31,7 @@ class Manager:
 		if event in self.registered.keys(): raise eventExistsError(event, self.registered[event], structure)
 		self.registered[event] = structure
 
-	async def subscribe(self, event: str, callBack: Coroutine, requirements: dict = {}):
+	async def subscribe(self, event: str, callBack: Coroutine):
 		"""
 		Subscribes to an event.
 
@@ -39,16 +39,9 @@ class Manager:
 		:type event: str
 		:param callBack: The function that is awaited upon the execution of the event.
 		:type callBack: Coroutine
-		:param requirements: The data that is required for this callBack
-		:type requirements: dict, optional
 		"""
 		if event not in self.registered.keys(): raise eventMissingError(f'The event {event} does not exist.', event)
-		structure = self.registered[event]
-		for k in requirements.keys():
-			if k in structure.keys(): continue
-			raise invalidRequirementsError(f'The requirement {k} is not valid because it is not with in the registered structure for the {event} event.', requirements)
-		subscriber = Subscriber(callBack, requirements)
-		self.subscribers[event].append(subscriber)
+		self.subscribers[event].append(callBack)
 
 	async def unregister(self, event: str):
 		"""
@@ -66,7 +59,6 @@ class Manager:
 
 		:param event: The name of the event to post.
 		:type event: str
-		:param data: The extra data to go alon with the event.
 		:raises eventMissingError: when an event has not yet been registered.
 		:raises invalidEventError: when the event data does not match the registered event datas types.
 		"""
@@ -77,7 +69,7 @@ class Manager:
 			if isinstance(value, self.registered[event][key]): continue
 			raise invalidEventError(f'The event {event} did not matche its registered protocol. It was expecting the key {key} to be of type {self.registered[event][key]} but it was of type {type(value)}', event)
 		if event not in self.subscribers.keys(): return
-		await asyncio.gather(*[e.Callback(data) for e in self.subscribers[event] if e.requirements.items() in data.items()])
+		await asyncio.gather(*[e(data) for e in self.subscribers[event] ])
 
 	def isRegistered(self, event: str):
 		"""
