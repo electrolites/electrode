@@ -5,11 +5,10 @@ Event class for electrode.
 import asyncio
 from collections import defaultdict
 from typing import Any, Coroutine, Protocol
-import electrode
-from electrode.events.errors import eventExistsError, eventMissingError, invalidEventError, invalidRequirementsError
-from electrode.events.subscriber import Subscriber
+from .errors import eventExistsError, eventMissingError, invalidEventError, invalidRequirementsError
+from .subscriber import Subscriber
 
-class eventManager:
+class Manager:
 	"""
 	Class for subscribing to, registering,  and unregistering events
 	"""
