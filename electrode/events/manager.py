@@ -18,7 +18,8 @@ class Manager:
 		self.subscribers = defaultdict(list [Coroutine])
 		self.registered={}
 
-	async def register(self, event: str, structure: dict = {}):
+	async def register(self, event: str, structure = {}):
+
 		"""
 		registers an event, setting up its required data.
 
@@ -80,3 +81,22 @@ class Manager:
 		:type event: str
 		"""
 		return event in self.registered.keys()
+
+	async def waitForEvent(self, event: str):
+		"""
+		blocks untill the spesifide event has occurred.
+
+		:param event: The name of the event to wait for.
+		:type event: str
+		:raises eventMissingError: When the event being waited for is not registered.
+		"""
+		if not self.isRegistered(event): raise eventMissingError(f'The event {event} can not be waited for because it is not in the event Managers registrar.', event)
+		waiting = True
+		eventData = None
+		async def waitStopper(self, eventDict):
+			waiting = False
+			eventData = eventDict
+		await self.subscribe(event, waitStopper)
+		while waiting:
+			await asyncio.sleep(0.0001)
+		return eventData

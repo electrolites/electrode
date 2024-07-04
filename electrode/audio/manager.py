@@ -1,9 +1,14 @@
 """
-Sound managment classes for Electrode.
+Sound management classes for Electrode.
 """
-from itertools import chain
+
 from asyncio import create_task
+from itertools import chain
+
+from typing import Coroutine, Tuple
+
 import cyal
+
 from .pool import pool as Pool
 from .sound import Sound
 from .stream import Stream
@@ -11,7 +16,7 @@ from .fileStream import FileStream
 from .group import Group, soundFactoryType
 
 class Manager:
-	def __init__(self, path: str, key: str = "", device: cyal.Device | None=None, context: cyal.Context | None=None):
+	def __init__(self, path: str, eventManager, key: str = "",  device: cyal.Device | None=None, context: cyal.Context | None=None):
 		self.device = device or cyal.Device()
 		self.context=context or cyal.Context(self.device, make_current=True, hrtf_soft=1)
 		self.alListener=self.context.listener
@@ -21,90 +26,105 @@ class Manager:
 		self.oneShotSounds: list[Sound]=[]
 		self.sounds: list[Sound]=[]
 		self.streams: list[Stream] = []
+		self.eventManager = eventManager
 
-	def newSound(self, filePath: str, oneShot= False, **kwargs):
-		s=Sound(self.context,self.pool.get(filePath),**kwargs)
-		if oneShot==True:
-			if s.looping==True: raise ValueError("Looping must be False if oneShot is true.")
-			self.oneShotSounds.append(s)
-		else: self.sounds.append(s)
-		return s
+	async def addSound(self, event):
+		if event['oneShot']==True:
+			if event['sound'].looping==True: raise ValueError("Looping must be False if oneShot is true.")
+			self.oneShotSounds.append(event['sound'])
+		else: self.sounds.append(event['sound'])
 
-	def newOneShotSound(self, filePath: str, **kwargs): return self.newSound(filePath, True, **kwargs)
-
-	def newFileStream(self, filePath: str, **kwargs):
-		s = FileStream(self.context, self.pool.getFile(filePath), **kwargs)
-		self.streams.append(s)
-		return s
-
-	def newGeneration(self, genoraterType: str, *args, oneShot: bool = False, **kwargs):
-		buffer=self.pool.generate(genoraterType, *args, **kwargs)
-		s=Sound(self.context, buffer, **kwargs)
-		if oneShot==True:
-			if s.looping==True: raise ValueError("Looping must be False if oneShot is true.")
-			self.oneShotSounds.append(s)
-		else: self.sounds.append(s)
-		return s
+	async def addStream(self, event):
+		self.streams.append(event['stream'])
 
 	def newGroup(self, soundFactory: soundFactoryType|None=None, **defaults):
 		if soundFactory is None: soundFactory=self.newOneShotSound
 		return Group(soundFactory, **defaults)
 
-
-	def tryCleanOneShots(self):
+	async def triCleanOneShots(self, event: dict):
 		for s in self.oneShotSounds:
 			if s.isStopped: self.oneShotSounds.remove(s)
+		await self.eventManager.postEvent('electrode.audioManager.triedCleanOneShots')
 
-	def forceCleanOneShots(self):
+	async def forceCleanOneShots(self, event: dict):
 		for s in self.oneShotSounds:
-			if not s.isStopped: s.stop()
+			if not s.isStopped: await s.stop()
 		self.oneShotSounds.clear()
+		await self.eventManager.postEvent('electrode.audioManager.forcedCleanOneShots')
 
-	def tryCleanAll(self):
-		self.tryCleanOneShots
+	async def triCleanAll(self, event):
+		await self.eventManager.postEvent('electrode.command.audioManager.triCleanOneShots')
 		for s in self.sounds:
 			if s.isStopped: self.sounds.remove(s)
+		self.eventManager.postEvent('electrode.audioManager.triedCleanAll')
 
-	def forceCleanAll(self):
-		self.forceCleanOneShots()
+	async def forceCleanAll(self):
+		await self.eventManager.postEvent('electrode.command.audioManager.forceCleanOneShots')
+		await self.eventManager.waitForEvent('electrode.audioManager.triedCleanOneShots')
 		for s in self.sounds:
-			if not s.isStopped: s.stop()
+			if not s.isStopped: await s.stop()
 		self.sounds.clear()
+		await self.eventManager.postEvent('electrode.audioManager.forcedCleanAll')
 
-	@property
-	def listenerPosition(self) -> list[float]:
-		return [self.alListener.position[0], self.alListener.position[2]*-1, self.alListener.position[1]]
+	async def changeListenerPosition(self, event: dict):
+		self.alListener.position = [event['x'], event['z'], event['y']]
+		await self.eventManager.postEvent('electrode.audioManager.listenerPositionChanged', x = self.alListener.position[0], y = self.alListener.position[2]*-1, z = self.alListener.position[1])
 
-	@listenerPosition.setter
-	def listenerPosition(self, val: list[float]):
-		self.alListener.position=val
+	async def changeListenerX(self, event: dict):
+		await self.eventManager.postEvent('electrode.command.changeListenerPosition', x = event['x'], y = self.alListener.position[2]*-1, z = self.alListener.position[1])
 
-	@property
-	def listenerX(self) -> float: return self.listenerPosition[0]
+	async def changeListenerY(self, event: dict):
+		await self.eventManager.postEvent('electrode.command.changeListenerPosition', x = self.alListener.position[0], y = event['y'], z = self.alListener.position[1])
 
-	@listenerX.setter
-	def listenerX(self, val: float):
-		pos=self.listenerPosition
-		self.listenerPosition=[val, pos[1], pos[2]]
+	async def changeListenerZ(self, event: dict):
+		await self.eventManager.postEvent('electrode.command.changeListenerPosition', x = self.alListener.position[0], y = self.alListener.position[2]*-1, z = event['z'])
 
-	@property
-	def listenerY(self) -> float: return self.listenerPosition[1]
+	async def _setUpInternalEvents(self):
+		eventPrefix = 'electrode.audioManager.'
+		soundEventPrefix = 'electrode.sound.'
+		streamEventPrefix = 'electrode.stream.'
+		commandPrefix = 'electrode.command.audioManager.'
+		events = {
+			eventPrefix+'listenerPositionChanged': {'x': int, 'y': int, 'z': int},
+			commandPrefix+'changeListenerPosition': {'x': int, 'y': int, 'z': int},
+			commandPrefix+'changeListenerX': {'x': int},
+			commandPrefix+'changeListenerY': {'y': int},
+			commandPrefix+'changeListenerZ': {'z': int},
+			commandPrefix+'addSound': {'sound': Sound, 'oneShot': bool},
+			commandPrefix+'addStream': {'stream': Stream},
+			eventPrefix+'triedCleanOneShots': {},
+			eventPrefix+'forcedCleanOneShots': {},
+			eventPrefix+'triedCleanAll': {},
+			eventPrefix+'forcedCleanAll': {},
+			commandPrefix+'tryCleanOneShots': {},
+			commandPrefix+'forceCleanOneShots': {},
+			commandPrefix+'tryCleanAll': {},
+			commandPrefix+'forceCleanAll': {},
+			soundEventPrefix+'stopped': {'sound': Sound},
+			soundEventPrefix+'paused': {'sound': Sound},
+			soundEventPrefix+'playing': {'sound': Sound},
+			soundEventPrefix+'gainUpdated': {'sound': Sound, 'gain': float},
+			soundEventPrefix+'rolloffFactorUpdated': {'sound': Sound, 'rolloffFactor': float},
+			soundEventPrefix+'pitchUpdated': {'sound': Sound, 'pitch': float},
+			soundEventPrefix+'directEnabled': {'sound': Sound},
+			soundEventPrefix+'directDisabled': {'sound': Sound},
+			soundEventPrefix+'directionUpdated': {'sound': Sound, 'x': float, 'y': float, 'z': float},
+			soundEventPrefix+'positionUpdated': {'sound': Sound, 'x': float, 'y': float, 'z': float},
+		}
+		for name, structure in events.items():
+			await self.eventManager.register(name, **structure)
+		await self._subscribeToInternalEvents()
 
-	@listenerY.setter
-	def listenerY(self, val: float):
-		pos=self.listenerPosition
-		self.listenerPosition=[pos[0], val, pos[2]]
-
-	@property
-	def listenerZ(self) -> float: return self.listenerPosition[2]
-
-	@listenerZ.setter
-	def listenerZ(self, val: float):
-		pos=self.listenerPosition
-		self.listenerPosition=[pos[0], pos[1], val]
-
-	def push(self):
-		# Call on every itoration of the event loop.
-		for s in chain(self.oneShotSounds, self.sounds):
-			if not s.playedOnce: s.play()
-		self.tryCleanOneShots()
+	async def _subscribeToInternalEvents(self):
+		eventPrefix = 'electrode.audioManager.'
+		commandPrefix = 'electrode.command.audioManager.'
+		self.eventManager.subscribe(commandPrefix+'changeListenerPosition', self.changeListenerPosition)
+		self.eventManager.subscribe(commandPrefix+'changeListenerX', self.changeListenerX)
+		self.eventManager.subscribe(commandPrefix+'changeListenerY', self.changeListenerY)
+		self.eventManager.subscribe(commandPrefix+'changeListenerZ', self.changeListenerZ)
+		self.eventManager.subscribe(commandPrefix+'addSound', self.addSound)
+		self.eventManager.subscribe(commandPrefix+'addStream', self.addStream)
+		self.eventManager.subscribe(commandPrefix+'triCleanOneShots', self.triCleanOneShots)
+		self.eventManager.subscribe(commandPrefix+'forceCleanOneShots', self.forceCleanOneShots)
+		self.eventManager.subscribe(commandPrefix+'triCleanAll', self.triCleanAll)
+		self.eventManager.subscribe(commandPrefix+'forceCleanAll', self.forceCleanAll)
