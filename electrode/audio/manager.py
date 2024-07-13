@@ -13,7 +13,6 @@ from .pool import pool as Pool
 from .sound import Sound
 from .stream import Stream
 from .fileStream import FileStream
-from .group import Group, soundFactoryType
 
 class Manager:
 	def __init__(self, path: str, eventManager, key: str = "",  device: cyal.Device | None=None, context: cyal.Context | None=None):
@@ -36,10 +35,6 @@ class Manager:
 
 	async def addStream(self, event):
 		self.streams.append(event['stream'])
-
-	def newGroup(self, soundFactory: soundFactoryType|None=None, **defaults):
-		if soundFactory is None: soundFactory=self.newOneShotSound
-		return Group(soundFactory, **defaults)
 
 	async def triCleanOneShots(self, event: dict):
 		for s in self.oneShotSounds:
