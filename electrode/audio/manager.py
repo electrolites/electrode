@@ -75,9 +75,9 @@ class Manager:
 		await self.eventManager.postEvent('electrode.command.changeListenerPosition', x = self.alListener.position[0], y = self.alListener.position[2]*-1, z = event['z'])
 
 	async def _setUpInternalEvents(self):
-		eventPrefix = 'electrode.audioManager.'
-		soundEventPrefix = 'electrode.sound.'
-		streamEventPrefix = 'electrode.stream.'
+		eventPrefix = 'electrode.audio.manager.'
+		soundEventPrefix = 'electrode.audio.sound.'
+		streamEventPrefix = 'electrode.audio.stream.'
 		commandPrefix = 'electrode.command.audioManager.'
 		events = {
 			eventPrefix+'listenerPositionChanged': {'x': int, 'y': int, 'z': int},
@@ -111,7 +111,7 @@ class Manager:
 		await self._subscribeToInternalEvents()
 
 	async def _subscribeToInternalEvents(self):
-		eventPrefix = 'electrode.audioManager.'
+		eventPrefix = 'electrode.audio.manager.'
 		commandPrefix = 'electrode.command.audioManager.'
 		self.eventManager.subscribe(commandPrefix+'changeListenerPosition', self.changeListenerPosition)
 		self.eventManager.subscribe(commandPrefix+'changeListenerX', self.changeListenerX)

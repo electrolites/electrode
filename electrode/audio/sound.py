@@ -139,6 +139,5 @@ class Sound:
 		if self.isPlaying: return self.alSource.pause()
 		await self._postEvent('paused')
 
-
 	async def _postEvent(self, event: str, **kwargs):
-		await self.eventManager.postEvent('electrode.sound.'+event, sound = self, **kwargs)
+		await self.eventManager.postEvent('electrode.audio.sound.'+event, sound = self, **kwargs)
