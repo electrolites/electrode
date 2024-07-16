@@ -51,5 +51,5 @@ class Electrode:
 			'electrode.general.start': {'time': time.time},
 			'electrode.internal.subscriptionsComplete': {},
 			'electrode.Command.initializeAudioManager': {'path': str, 'key': str},
-			'electrode.audioManager.initialized': {'audioManager', AudioManager}
+			'electrode.audio.manager.initialized': {'audioManager', AudioManager}
 		}
