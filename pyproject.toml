@@ -1,29 +1,26 @@
-[tool.poetry]
+[project]
 name = "electrode"
+authors = [
+    {name = "blindelectron", email = "jump.leper@gmail.com"},
+]
 version = "0.1.0"
 description = "A powerfull audio game engine written in python."
-authors = ["blindelectron <jump.leper@gmail.com>"]
 readme = "README.md"
-license = "LGPL-3.0-only"
+license = {text = "LGPL-3.0-only"}
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "cyal>=0.3.2,<1.0.0",
+    "pybullet>=3.2.5,<4.0.0",
+    "numpy>=1.26.2,<2.0.0",
+    "webcolors>=1.13,<2.0",
+    "wxpython>=4.2.1,<5.0.0",
+    "soundfile>=0.12.1,<1.0.0",
+    "pyttsx4>=3.0.15,<4.0.0",
+    "wxasync>=0.49,<1.0",
+    "accessible-output3>=0.1.2,<1.0.0",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-cyal = "^0.3.2"
-pybullet = "^3.2.5"
-numpy = "^1.26.2"
-webcolors = "^1.13"
-wxpython = "^4.2.1"
-soundfile = "^0.12.1"
-pyttsx4 = "^3.0.15"
-wxasync = "^0.49"
-accessible-output3 = "^0.1.2"
-
-[tool.poetry.group.more_tts]
-optional  = true
-
-[tool.poetry.group.more_tts.dependencies]
-gtts = "^2.5.0"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+more_tts = [
+    "gtts>=2.5.0,<3.0.0",
+]
